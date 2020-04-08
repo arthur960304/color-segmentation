@@ -10,6 +10,7 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 
 Please review [requirements.txt](https://github.com/arthur960304/color-segmentation/blob/master/requirements.txt).
+
 Download the training data [here](https://drive.google.com/open?id=158j9YPU_k0C2HijSh_9kc8x8VUMwF2ZU).
 
 ## Code organization
@@ -19,7 +20,7 @@ Download the training data [here](https://drive.google.com/open?id=158j9YPU_k0C2
     ├── gaussian                # Scripts for Gaussian
     │   ├── gaussian_model.py   # Implement gaussian model
     │   └── guassian_param.py   # Calculate mean and covariance for every class
-    ├── logistic		        # Scripts for Logistic Regression
+    ├── logistic		    # Scripts for Logistic Regression
     │   ├── logistic_model.py   # Implement logistic regression model
     │   └── train_logistic.py   # Train the logistic regression model
     ├── labeltool.py            # hand-labeling tool, created by Chun-Nien Chan
