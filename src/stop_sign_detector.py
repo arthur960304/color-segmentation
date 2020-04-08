@@ -1,8 +1,3 @@
-'''
-ECE276A WI20 HW1
-Stop Sign Detector
-'''
-
 import os, cv2
 import numpy as np
 import matplotlib.pyplot as plt
