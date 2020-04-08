@@ -30,7 +30,8 @@ Download the training data [here](https://drive.google.com/open?id=158j9YPU_k0C2
 
 ### Steps
 
-1. Run the command `python stop_sign_detector.py` and the resulting images will display.
+1. Remember to put `/trainset` in your working folder.
+2. Run the command `python stop_sign_detector.py` and the resulting images will display.
 
 ## Implementations
 
