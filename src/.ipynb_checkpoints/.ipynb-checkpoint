@@ -1,0 +1,202 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 52,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import os, cv2\n",
+    "import numpy as np\n",
+    "from skimage.measure import label, regionprops"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Create simple gaussian model"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 53,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "class Single_Gaussian(object):\n",
+    "    def __init__(self, mu, cov):\n",
+    "        self.mean = mu\n",
+    "        self.cov = cov\n",
+    "    \n",
+    "    def show_mean_cov(self):\n",
+    "        return [self.mean, self.cov]\n",
+    "    \n",
+    "    def predict(self, x):\n",
+    "        cov_inv = np.linalg.inv(self.cov)\n",
+    "        exp_term = -0.5 * np.matmul(np.matmul((x-self.mean).T, cov_inv), (x-self.mean))\n",
+    "        coeff = np.sqrt(((2*np.pi)**3)*(np.linalg.det(self.cov)))\n",
+    "        return exp_term / coeff"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Calculate gaussian parameters for different color classes"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 54,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def load_npz(name):\n",
+    "    with open('../label_npz/%s.npz' %name, 'rb') as f:\n",
+    "        npz = np.load(f)\n",
+    "    return npz"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 56,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "train_folder = \"/label_npz\"\n",
+    "\n",
+    "# dictionary for the pixel rgb data\n",
+    "data_dict = {\n",
+    "    'COLOR_STOP_SIGN_RED': np.array([[0, 0, 0]]),\n",
+    "    'COLOR_OTHER_RED'    : np.array([[0, 0, 0]]),\n",
+    "    'COLOR_BROWN'        : np.array([[0, 0, 0]]),\n",
+    "    'COLOR_ORANGE'       : np.array([[0, 0, 0]]),\n",
+    "    'COLOR_BLUE'         : np.array([[0, 0, 0]]),\n",
+    "    'COLOR_OTHER'        : np.array([[0, 0, 0]])\n",
+    "}\n",
+    "\n",
+    "# dictionary for the pixel mean values, converting to numpy arrays for faster computation.\n",
+    "mean_dict = {\n",
+    "    'COLOR_STOP_SIGN_RED': np.array([0, 0, 0]),\n",
+    "    'COLOR_OTHER_RED'    : np.array([0, 0, 0]),\n",
+    "    'COLOR_BROWN'        : np.array([0, 0, 0]),\n",
+    "    'COLOR_ORANGE'       : np.array([0, 0, 0]),\n",
+    "    'COLOR_BLUE'         : np.array([0, 0, 0]),\n",
+    "    'COLOR_OTHER'        : np.array([0, 0, 0])\n",
+    "}\n",
+    "\n",
+    "# calculate gaussian parameters for different classes\n",
+    "def calculate_guass_param(class_name):\n",
+    "    \"\"\"To calculate mean and covariance for different color classes\n",
+    "    \n",
+    "    Args:\n",
+    "        class_name(string): COLOR_STOP_SIGN_RED, COLOR_OTHER_RED, COLOR_BROWN, COLOR_ORANGE, COLOR_BLUE, COLOR_OTHER\n",
+    "    \"\"\"\n",
+    "    # load npz files\n",
+    "    data_len = 0\n",
+    "    for file in os.listdir(train_folder):\n",
+    "        if file.endswith(\".npz\"):\n",
+    "            npz_file = load_npz(file)\n",
+    "            data_len += len(npz_file[class_name])\n",
+    "            data_dict[class_name] = np.append(data_dict['COLOR_STOP_SIGN_RED'], np.array(npz_file[class_name]), axis=0)\n",
+    "            #data_sum = np.sum(npz_file[class_name], axis=0)\n",
+    "            #data_dict[class_name] += data_sum\n",
+    "    mean_dict[class_name] = np.sum(data_dict[class_name], axis=0) / data_len"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 57,
+   "metadata": {},
+   "outputs": [
+    {
+     "ename": "FileNotFoundError",
+     "evalue": "[Errno 2] No such file or directory: '/label_npz'",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[0;31mFileNotFoundError\u001b[0m                         Traceback (most recent call last)",
+      "\u001b[0;32m<ipython-input-57-9ae4801eed64>\u001b[0m in \u001b[0;36m<module>\u001b[0;34m\u001b[0m\n\u001b[0;32m----> 1\u001b[0;31m \u001b[0mcalculate_guass_param\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m'COLOR_OTHER_RED'\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m",
+      "\u001b[0;32m<ipython-input-56-a105033b95a5>\u001b[0m in \u001b[0;36mcalculate_guass_param\u001b[0;34m(class_name)\u001b[0m\n\u001b[1;32m     30\u001b[0m     \u001b[0;31m# load npz files\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     31\u001b[0m     \u001b[0mdata_len\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0;36m0\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m---> 32\u001b[0;31m     \u001b[0;32mfor\u001b[0m \u001b[0mfile\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mos\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mlistdir\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mtrain_folder\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m     33\u001b[0m         \u001b[0;32mif\u001b[0m \u001b[0mfile\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mendswith\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\".npz\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     34\u001b[0m             \u001b[0mnpz_file\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mload_npz\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mfile\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;31mFileNotFoundError\u001b[0m: [Errno 2] No such file or directory: '/label_npz'"
+     ]
+    }
+   ],
+   "source": [
+    "calculate_guass_param('COLOR_OTHER_RED')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 51,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([1, 2, 3])"
+      ]
+     },
+     "execution_count": 51,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data_dict['COLOR_STOP_SIGN_RED'] = np.append(data_dict['COLOR_STOP_SIGN_RED'], np.array([[1,2,3]]), axis=0)\n",
+    "np.sum(data_dict['COLOR_STOP_SIGN_RED'], axis=0)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 43,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([[1, 2, 3],\n",
+       "       [4, 5, 6],\n",
+       "       [7, 8, 9]])"
+      ]
+     },
+     "execution_count": 43,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "np.append([[1, 2, 3], [4, 5, 6]], [[7, 8, 9]], axis=0)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.7.4"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
