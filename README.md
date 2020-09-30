@@ -1,4 +1,4 @@
-# Color Segmentation
+# Stop Sign Detector
 
 This project aims to train a probabilistic color model from image data and use it to segment unseen images, detect stop signs in an image, and draw bounding boxes around them. Logistic Model and Simple Gaussian Model are used in this projects for comparison.
 
