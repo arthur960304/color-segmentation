@@ -1,6 +1,8 @@
 # Stop Sign Detector
 
-![Example Result](https://github.com/arthur960304/color-segmentation/blob/master/results/log_bbox_1.png)
+<p align="center">
+  <img width="460" height="300" src="https://github.com/arthur960304/color-segmentation/blob/master/results/log_bbox_1.png">
+</p>
 
 This project aims to train a probabilistic color model from image data and use it to segment unseen images, detect stop signs in an image, and draw bounding boxes around them. Logistic Model and Simple Gaussian Model are used in this projects for comparison.
 
