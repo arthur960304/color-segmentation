@@ -15,7 +15,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 Please review [requirements.txt](https://github.com/arthur960304/color-segmentation/blob/master/requirements.txt).
 
-Download the training data [here](https://drive.google.com/open?id=158j9YPU_k0C2HijSh_9kc8x8VUMwF2ZU).
+Download the training [data](https://drive.google.com/open?id=158j9YPU_k0C2HijSh_9kc8x8VUMwF2ZU).
 
 ## Code organization
 
